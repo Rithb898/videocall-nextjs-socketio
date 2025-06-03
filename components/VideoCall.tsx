@@ -6,7 +6,7 @@ import VideoContainer from "./VideoContainer";
 import { Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react";
 
 const VideoCall = () => {
-  const { localStream, peer, ongoingCall } = useSocket();
+  const { localStream, peer, ongoingCall, handleHangUp, isCallEnded } = useSocket();
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
 
@@ -49,66 +49,77 @@ const VideoCall = () => {
 
   const isOnCall = localStream && peer && ongoingCall ? true : false;
 
+  if(isCallEnded) {
+    return <div>Call ended</div>
+  }
+
+  if (!localStream && !peer) return
+
   return (
     <div className='min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50'>
       <div className='relative w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl bg-white'>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 p-4'>
-        {localStream && (
-        <div className='relative rounded-2xl overflow-hidden'>
-          <VideoContainer
-          stream={localStream}
-          isLocalStream={true}
-          isOnCall={isOnCall}
-          />
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 p-4'>
+          {localStream && (
+            <div className='relative rounded-2xl overflow-hidden'>
+              <VideoContainer
+                stream={localStream}
+                isLocalStream={true}
+                isOnCall={isOnCall}
+              />
+            </div>
+          )}
+          {peer && peer.stream && (
+            <div className='relative rounded-2xl overflow-hidden'>
+              <VideoContainer
+                stream={peer.stream}
+                isLocalStream={false}
+                isOnCall={isOnCall}
+              />
+            </div>
+          )}
         </div>
-        )}
-        {peer && peer.stream && (
-        <div className='relative rounded-2xl overflow-hidden'>
-          <VideoContainer
-          stream={peer.stream}
-          isLocalStream={false}
-          isOnCall={isOnCall}
-          />
-        </div>
-        )}
-      </div>
       </div>
       <div className='mt-8'>
-      {localStream && (
-        <div className='flex items-center gap-8 bg-white px-8 py-4 rounded-full shadow-xl'>
-        <button
-          onClick={toggleMic}
-          className={`p-5 rounded-full transition-all duration-300 hover:scale-110 ${
-          isMicOn
-            ? "bg-emerald-500 hover:bg-emerald-600"
-            : "bg-rose-500 hover:bg-rose-600"
-          }`}
-        >
-          {isMicOn ? (
-          <Mic className='w-7 h-7 text-white' />
-          ) : (
-          <MicOff className='w-7 h-7 text-white' />
-          )}
-        </button>
-        <button className='p-5 rounded-full bg-rose-500 hover:bg-rose-600 transition-all duration-300 hover:scale-110'>
-          <PhoneOff className='w-7 h-7 text-white' />
-        </button>
-        <button
-          onClick={toggleCamera}
-          className={`p-5 rounded-full transition-all duration-300 hover:scale-110 ${
-          isCameraOn
-            ? "bg-emerald-500 hover:bg-emerald-600"
-            : "bg-rose-500 hover:bg-rose-600"
-          }`}
-        >
-          {isCameraOn ? (
-          <Video className='w-7 h-7 text-white' />
-          ) : (
-          <VideoOff className='w-7 h-7 text-white' />
-          )}
-        </button>
-        </div>
-      )}
+        {localStream && (
+          <div className='flex items-center gap-8 bg-white px-8 py-4 rounded-full shadow-xl'>
+            <button
+              onClick={toggleMic}
+              className={`p-5 rounded-full transition-all duration-300 hover:scale-110 ${
+                isMicOn
+                  ? "bg-emerald-500 hover:bg-emerald-600"
+                  : "bg-rose-500 hover:bg-rose-600"
+              }`}
+            >
+              {isMicOn ? (
+                <Mic className='w-7 h-7 text-white' />
+              ) : (
+                <MicOff className='w-7 h-7 text-white' />
+              )}
+            </button>
+            <button
+              onClick={() => handleHangUp({ 
+                ongoingCall: ongoingCall ? ongoingCall : undefined, isEmitHangup: true 
+              })}
+              className='p-5 rounded-full bg-rose-500 hover:bg-rose-600 transition-all duration-300 hover:scale-110'
+            >
+              <PhoneOff className='w-7 h-7 text-white' />
+            </button>
+            <button
+              onClick={toggleCamera}
+              className={`p-5 rounded-full transition-all duration-300 hover:scale-110 ${
+                isCameraOn
+                  ? "bg-emerald-500 hover:bg-emerald-600"
+                  : "bg-rose-500 hover:bg-rose-600"
+              }`}
+            >
+              {isCameraOn ? (
+                <Video className='w-7 h-7 text-white' />
+              ) : (
+                <VideoOff className='w-7 h-7 text-white' />
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

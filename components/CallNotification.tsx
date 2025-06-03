@@ -5,7 +5,8 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { Phone, PhoneOff } from "lucide-react";
 
 const CallNotification = () => {
-  const { ongoingCall, handleJoinCall } = useSocket();
+  const { ongoingCall, handleJoinCall, handleHangUp } = useSocket();
+
   if (!ongoingCall?.isRinging) return null;
   return (
     <div className='fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50'>
@@ -30,7 +31,15 @@ const CallNotification = () => {
             >
               <Phone className='w-7 h-7' />
             </button>
-            <button className='w-16 h-16 bg-rose-500 hover:bg-rose-600 active:scale-95 transition-all rounded-full flex items-center justify-center text-white shadow-xl hover:shadow-rose-300/50'>
+            <button
+              onClick={() =>
+                handleHangUp({
+                  ongoingCall: ongoingCall ? ongoingCall : undefined,
+                  isEmitHangup: true,
+                })
+              }
+              className='w-16 h-16 bg-rose-500 hover:bg-rose-600 active:scale-95 transition-all rounded-full flex items-center justify-center text-white shadow-xl hover:shadow-rose-300/50'
+            >
               <PhoneOff className='w-7 h-7' />
             </button>
           </div>

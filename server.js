@@ -3,6 +3,7 @@ import next from "next";
 import { Server } from "socket.io";
 import onCall from "./socket-event/onCall.js";
 import onWebrtcSignal from "./socket-event/onWebrtcSignal.js";
+import onHangUp from "./socket-event/onHangUp.js";
 
 
 const dev = process.env.NODE_ENV !== "production";
@@ -37,6 +38,7 @@ app.prepare().then(() => {
         // Call Event
         socket.on('call', onCall)
         socket.on("webrtcSignal", onWebrtcSignal);
+        socket.on("hangup", onHangUp)
 
         socket.on("disconnect", () => {
             onlineUsers = onlineUsers.filter((u) => u.socketId !== socket.id);
